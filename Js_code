@@ -1,0 +1,48 @@
+// ----------------------
+// Nick JavaScript sample
+// ----------------------
+//
+// visit redit click on reddit login buton
+
+"phantombuster command: nodejs"
+"phantombuster package: 4"
+
+const Nick = require("nickjs")
+const nick = new Nick()
+const Buster = require("phantombuster")
+const buster = new Buster()
+
+
+//function to open tab and visit a website
+async function open_tab(link){
+	const tab = await nick.newTab()
+	await tab.open(link)
+
+	// It's considered a best-practice to always wait for the DOM element that interests you
+	// when manipulating a website (like when clicking a button or loading a page)
+	await tab.waitUntilVisible(["p", "span"], 10000, "or")
+
+
+
+
+
+	nick.exit()
+	console.log(`Sucess`)
+	return tab
+}
+
+//function to click on element
+async function click_element(selector, pageTimeout, tab){
+	try {
+		await tab.waitUntilVisible(selector, pageTimeout)
+		//await tab.waitUntilPresent(selector, pageTimeout)
+		await tab.click(selector)
+	} catch(err) {
+  console.log("Oh no! Even after 5s, the element was still not present. ", err)
+}
+}
+
+const Timeout = 5000
+tab1 = open_tab('https://www.reddit.com/')
+click_element('a[https://www.reddit.com/login"]', Timeout, tab1)
+
