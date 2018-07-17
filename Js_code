@@ -27,7 +27,7 @@ return login_set.logs
 async function main_function(){
 login_set =  get_global_object()
 // custom function to log on reddit should use the 2nd login set from global object
-reddit_login(login_set[1]["user"] , log[1]["pass"])
+reddit_login(login_set[1]["user"] , login_set[1]["pass"])
 }
 
 // return error:
