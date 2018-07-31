@@ -1,34 +1,100 @@
-// global oject:
-{
-	"logs": [
-		{
-			"user": "fab_gh",
-			"pass": "blabla"
-		},
-		{
-			"user": "fab_gh2",
-			"pass": "blabla2"
-		}
-	]
-}
+// ----------------------
+// Nick JavaScript sample
+// ----------------------
+//
+// visit redit click on reddit login buton
 
-//function to get global object
+"phantombuster command: nodejs"
+"phantombuster package: 4"
+
+
+const Timeout = 5000
+const Nick = require("nickjs")
+const nick = new Nick()
+const Buster = require("phantombuster")
+const buster = new Buster()
+//const login_set = buster.getGlobalObject()
+
+
+
 async function get_global_object(){
-try {
-  const login_set = await buster.getGlobalObject()
-
-} catch (err) {
-  console.log("Could not get the global object:", err)
-}
+ login_set = await buster.getGlobalObject()
+console.log("got login details:")
 return login_set.logs
+
 }
 
-//Main call
-async function main_function(){
-login_set =  get_global_object()
-// custom function to log on reddit should use the 2nd login set from global object
-reddit_login(login_set[1]["user"] , login_set[1]["pass"])
+
+//function to open tab and visit a website
+async function open_tab(link){
+	try{
+	const tab = await nick.newTab()
+	
+
+
+	
+	
+	console.log("tab open")
+	await tab.open(link)
+	console.log("link open")
+	// It's considered a best-practice to always wait for the DOM element that interests you
+	// when manipulating a website (like when clicking a button or loading a page)
+
+	
+	return tab
+}
+ catch(err) {		
+  console.log("error opening tab", err)
+}
 }
 
-// return error:
-Cannot read property 'user' of undefined
+//function to click on element
+async function click_element(selector, pageTimeout, tab){
+	try {
+		//await tab.waitUntilVisible(selector, pageTimeout)
+		await tab.waitUntilPresent(selector, pageTimeout)
+		await tab.click(selector)
+	} catch(err) {
+  console.log("Oh no! Even after 5s, the element was still not present. ", err)
+  stemp = document.querySelector('.dayMode')
+  console.log(stemp)
+}
+}
+
+//function to send key to element
+async function send_keys(selector, pageTimeout, tab, to_type){
+	try {
+	await tab.waitUntilPresent(selector, pageTimeout)
+	const options = {
+					reset: true,
+					keepFocus: false,
+					modifiers: {}
+				}
+				
+	await tab.sendKeys(selector, to_type, options)
+	console.log("keysend")
+	
+		
+		
+		
+	} catch(err) {		
+  console.log("Could not send keys: ", err)
+    stemp = document.querySelector('.dayMode')
+  console.log(stemp)
+}
+}
+
+
+
+async function main() {
+main_tab = await open_tab('https://www.reddit.com')
+//click on log in buton
+await click_element('a[href^="https://www.reddit.com/login"]',Timeout,main_tab)
+console.log('step2')
+//script run until here without issue. At this point login popup should be open
+//next step should wait for login for to be visible and send user name to the Username field, but the form never get visible.
+await send_keys('#loginUsername', Timeout*10, main_tab, 'fab_gh' )
+}
+
+main()
+
