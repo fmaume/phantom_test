@@ -2,13 +2,13 @@
 // Nick JavaScript sample
 // ----------------------
 //
-// visit redit click on reddit login buton
+// upvote on reddit
 
 "phantombuster command: nodejs"
 "phantombuster package: 4"
 
 
-const Timeout = 5000
+const Timeout = 10000
 const Nick = require("nickjs")
 const nick = new Nick()
 const Buster = require("phantombuster")
@@ -84,17 +84,83 @@ async function send_keys(selector, pageTimeout, tab, to_type){
 }
 }
 
+const options = {
+					reset: true,
+					keepFocus: false
+				}
 
-
-async function main() {
-main_tab = await open_tab('https://www.reddit.com')
+//function to log on reddit
+async function reddit_login(user_name, password) {
+main_tab = await open_tab('https://www.reddit.com/login')
 //click on log in buton
-await click_element('a[href^="https://www.reddit.com/login"]',Timeout,main_tab)
+//await click_element('a[href^="https://www.reddit.com/login"]',Timeout,main_tab)
 console.log('step2')
-//script run until here without issue. At this point login popup should be open
-//next step should wait for login for to be visible and send user name to the Username field, but the form never get visible.
-await send_keys('#loginUsername', Timeout*10, main_tab, 'fab_gh' )
+
+await main_tab.waitUntilPresent('#loginUsername', Timeout)
+console.log('login form visible')
+
+				
+await main_tab.sendKeys('#loginUsername', user_name, options)
+console.log('taped user name')
+
+await main_tab.waitUntilPresent('#loginPassword', Timeout)
+console.log('login form visible2')
+await main_tab.sendKeys('#loginPassword', password, options)
+
+
+
+console.log('taped password')
+
+
+
+await main_tab.waitUntilPresent('.AnimatedForm__submitButton', Timeout)
+await click_element('.AnimatedForm__submitButton', Timeout,  main_tab)
+console.log('log in')
+
+await main_tab.waitUntilPresent('.scrollerItem', Timeout)
+console.log('log in completed')
+return main_tab
 }
 
-main()
+//js script to run in console
+function upvote_console_script(){
+stemp = document.querySelector('[data-test-id=post-content]')
+stemp = stemp.querySelector('[data-click-id=upvote]')
+stemp.click()	
+}
+
+//function to upvote
+async function main_upvote( tab, pageTimeout){
+try {
+
+await tab.waitUntilPresent('[data-test-id=post-content]', pageTimeout)
+console.log("upvote visible")
+tab.inject(upvote_console_script())
+tab.evaluate(upvote_console_script())
+
+
+console.log("upvoted")
+} catch(err) {		
+  console.log("Could not upvote", err)
+
+	
+}
+}
+
+
+async function main(main_link) {
+loging_set_all =  await get_global_object()
+console.log("loging detail in variable")
+
+main_tab = await reddit_login(loging_set_all[0].user , loging_set_all[0].pass)
+
+
+await main_tab.open(main_link)
+console.log("on target thread")
+await main_upvote(main_tab, Timeout)
+
+	
+}
+
+main('https://www.reddit.com/r/BlockChain/comments/94qk97/blockchain_once_seen_as_a_corporate_cureall/')
 
