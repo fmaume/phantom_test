@@ -149,9 +149,10 @@ console.log("upvoted")
 
 
 async function main(main_link) {
-loging_set_all =  await get_global_object()
-console.log("loging detail in variable")
+//loging_set_all =  await get_global_object()
+//console.log("loging detail in variable")
 
+//replace reddit_login with login parameter
 main_tab = await reddit_login(loging_set_all[0].user , loging_set_all[0].pass)
 
 
